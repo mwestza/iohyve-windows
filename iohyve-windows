@@ -50,7 +50,7 @@ __bootstrap() {
 			printf "done\n"
 		fi
 	fi
-	if [ "$winname" = "win2k12" ] || [ "$winname" = "all" ] || [ -z $winname ]; then
+	if [ "$winname" = "win2k12" ] ||  [ "$winname" = "win2k16" ] || [ "$winname" = "all" ] || [ -z $winname ]; then
 		if  [ ! -e /usr/local/etc/windows-iohyve/virtio-win-0.1-96.iso ]; then
 			printf "fetching post-Windows2k8 virtio driver: "
 			fetch https://fedorapeople.org/groups/virt/virtio-win/repo/stable/virtio-win-0.1.96-1.noarch.rpm -o /usr/local/etc/windows-iohyve/virtio-win-0.1-96.iso > /dev/null 2>&1
@@ -84,13 +84,13 @@ __create_iso() {
 
 	case "$winversion" in
 		"win2k8")
-			cp /usr/local/etc/windows-iohyve/autoxml/files/win2k8_AutoUnattend.xml /usr/local/etc/windows-iohyve/build-isos/win2k8/AutoUnattend.xml > /dev/null 2>&1
+			cp /usr/local/etc/windows-iohyve/autoxml/files/win2k8_AutoUnattend.xml /usr/local/etc/windows-iohyve/build-isos/win2k8/AutoUnattend.xml > /dev/null
 		;;
 		"win2k12")
-			cp /usr/local/etc/windows-iohyve/autoxml/files/win2k12r2_AutoUnattend.xml /usr/local/etc/windows-iohyve/build-isos/win2k12/AutoUnattend.xml > /dev/null 2>&1
+			cp /usr/local/etc/windows-iohyve/autoxml/files/win2k12r2_AutoUnattend.xml /usr/local/etc/windows-iohyve/build-isos/win2k12/AutoUnattend.xml > /dev/null
 		;;
 		"win2k16")
-			cp /usr/local/etc/windows-iohyve/autoxml/files/win2k16preview_AutoUnattend.xml /usr/local/etc/windows-iohyve/build-isos/win2k16/AutoUnattend.xml > /dev/null 2>&1
+			cp /usr/local/etc/windows-iohyve/autoxml/files/win2016preview_AutoUnattend.xml /usr/local/etc/windows-iohyve/build-isos/win2k16/AutoUnattend.xml > /dev/null
 		;;
 			
 	esac
@@ -125,17 +125,14 @@ __prepare() {
 	if [ -z "$(iohyve fwlist | grep BHYVE_UEFI_20151002)" ]; then
 		iohyve cpfw /usr/local/etc/windows-iohyve/BHYVE_UEFI_20151002.fd
 	fi
-	echo "before create"
 	iohyve create ${winversion}_${machinenumber} ${size}
-	echo "after create"
 	iohyve set ${winversion}_${machinenumber} fw=BHYVE_UEFI_20151002.fd bargs="-H -w" ram=1024M
-	echo "after set"
 }
 
 __first_run() {
 	local winversion="$1"
 	local machinenumber="$2"
-	iohyve uefi ${winversion}_${machinenumber} ${winversion}.iso
+	iohyve uefi ${winversion}_${machinenumber} windows-iohyve-${winversion}.iso
 }
 
 __second_run() {
